@@ -89,9 +89,9 @@
     },
     "skuName": {
       "type": "string",
-      "defaultValue": "Standard_B1ms",
+      "defaultValue": "Standard_B1s",
       "metadata": {
-        "description": "The name of the sku, e.g. Standard_D32ds_v4."
+        "description": "The name of the sku, e.g. Standard_B1s."
       }
     },
     "backupRetentionDays": {
