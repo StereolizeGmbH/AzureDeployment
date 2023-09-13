@@ -101,10 +101,7 @@
 			"properties": {
 				"charset": "utf8",
 				"collation": "utf8_general_ci"
-			},
-			"dependsOn": [
-				"[resourceId('Microsoft.DBforMySQL/flexibleServers', parameters('serverName'))]"
-			]
+			}
 		},
 		{
 			"type": "Microsoft.Web/sites",
