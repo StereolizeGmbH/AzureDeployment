@@ -8,14 +8,14 @@
 		},
 		"appServicePlan": {
 			"type": "string",
-			"defaultValue": "devstereolizewebserver"
+			"defaultValue": "devstereolizewebserver",
 			"metadata": {
 				"description": "Linux plan hosting the directus container"
 			}
 		},
 		"directusVersion": {
 			"type": "string",
-			"defaultValue": "latest"
+			"defaultValue": "latest",
 			"metadata": {
 				"description": "Directus Version, like 9.26.0 or latest"
 			}
@@ -43,7 +43,7 @@
 			"metadata": {
 				"description": "SMTP Password for email directus uses to communicate"
 			}
-		},		
+		},
 		"siteName": {
 			"type": "string",
 			"defaultValue": "[concat('directus-', 'truckservices')]",
@@ -53,25 +53,25 @@
 		},
 		"serverName": {
 			"type": "string",
-			"defaultValue": "devstereolizemysqlserver"
+			"defaultValue": "devstereolizemysqlserver",
 			"metadata": {
 				"description": "The name of an existing MySQL server."
 			}
-        },
+		},
 		"serverUser": {
 			"type": "string",
-			"defaultValue": "devmysqladmin"
+			"defaultValue": "devmysqladmin",
 			"metadata": {
 				"description": "Admin user name for SQL server"
 			}
-        },
+		},
 		"serverPassword": {
 			"type": "secureString",
 			"metadata": {
 				"description": "Admin password for SQL server"
 			}
 		},
-		"databaseName":{			
+		"databaseName": {
 			"type": "string",
 			"defaultValue": "devprojectnamemysqldb",
 			"metadata": {
@@ -96,15 +96,15 @@
 	"resources": [
 		{
 			"type": "Microsoft.DBforMySQL/flexibleServers/databases",
-			  "apiVersion": "2021-12-01-preview",
-			  "name": "[format('{0}/{1}', parameters('serverName'), parameters('databaseName'))]",
-			  "properties": {
+			"apiVersion": "2021-12-01-preview",
+			"name": "[format('{0}/{1}', parameters('serverName'), parameters('databaseName'))]",
+			"properties": {
 				"charset": "utf8",
 				"collation": "utf8_general_ci"
-			  },
-			  "dependsOn": [
+			},
+			"dependsOn": [
 				"[resourceId('Microsoft.DBforMySQL/flexibleServers', parameters('serverName'))]"
-			  ]
+			]
 		},
 		{
 			"type": "Microsoft.Web/sites",
@@ -132,7 +132,7 @@
 				"hyperV": false,
 				"siteConfig": {
 					"numberOfWorkers": 1,
-					"linuxFxVersion": "[concat('DOCKER|directus/directus:', parameters('directusVersion'))]",   
+					"linuxFxVersion": "[concat('DOCKER|directus/directus:', parameters('directusVersion'))]",
 					"alwaysOn": false,
 					"http20Enabled": false
 				},
@@ -167,7 +167,7 @@
 					{
 						"name": "CACHE_ENABLED",
 						"value": false
-					},					
+					},
 					{
 						"name": "DB_CLIENT",
 						"value": "mysql"
@@ -191,7 +191,7 @@
 					{
 						"name": "DB_PORT",
 						"value": 3306
-					},					
+					},
 					{
 						"name": "DB_USER",
 						"value": "[parameters('serverUser')]"
@@ -235,11 +235,11 @@
 					{
 						"name": "RATE_LIMITER_ENABLED",
 						"value": false
-					},					
+					},
 					{
 						"name": "SECRET",
 						"value": "[concat(uniqueString(resourceGroup().id), uniqueString(guid(resourceGroup().id)))]"
-					},					
+					},
 					{
 						"name": "STORAGE_LOCATIONS",
 						"value": "azure"
@@ -259,7 +259,7 @@
 					{
 						"name": "STORAGE_AZURE_ACCOUNT_KEY",
 						"value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-04-01').keys[0].value]"
-					},					
+					},
 					{
 						"name": "WEBSOCKETS_ENABLED",
 						"value": true
