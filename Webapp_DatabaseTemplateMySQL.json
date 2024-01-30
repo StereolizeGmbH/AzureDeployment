@@ -38,6 +38,13 @@
 				"description": "Email Directus uses to communicate with users"
 			}
 		},
+		"directus_EMAIL_SMTP_HOST": {
+			"type": "string",
+			"defaultValue": "smtp.office365.com",
+			"metadata": {
+				"description": "SMTP Host"
+			}
+		},
 		"directus_EMAIL_SMTP_PASSWORD": {
 			"type": "secureString",
 			"metadata": {
@@ -199,7 +206,7 @@
 					},
 					{
 						"name": "EMAIL_SMTP_HOST",
-						"value": "smtp.office365.com"
+						"value": "[parameters('directus_EMAIL_SMTP_HOST')]"
 					},
 					{
 						"name": "EMAIL_SMTP_PASSWORD",
@@ -328,6 +335,16 @@
 			"properties": {
 				"siteName": "[parameters('siteName')]",
 				"hostNameType": "Verified"
+			}
+		},
+		{
+			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+			"apiVersion": "2021-04-01",
+			"name": "[concat(parameters('storageAccountName'), '/default/', parameters('storageContainerName'))]",
+			"properties": {
+				"defaultEncryptionScope": "$account-encryption-key",
+				"denyEncryptionScopeOverride": false,
+				"publicAccess": "None"
 			}
 		}
 	],
