@@ -1,0 +1,379 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"location": {
+			"type": "string",
+			"defaultValue": "[resourceGroup().location]"
+		},
+		"appServicePlan": {
+			"type": "string",
+			"defaultValue": "devstereolizewebserver",
+			"metadata": {
+				"description": "Linux plan hosting the directus container"
+			}
+		},
+		"directusVersion": {
+			"type": "string",
+			"defaultValue": "latest",
+			"metadata": {
+				"description": "Directus Version, like 9.26.0 or latest"
+			}
+		},
+		"directusAdministratorEmail": {
+			"type": "string",
+			"metadata": {
+				"description": "Directus administrative account email"
+			}
+		},
+		"directusAdministratorPassword": {
+			"type": "secureString",
+			"metadata": {
+				"description": "Directus administrative account password"
+			}
+		},
+		"directus_EMAIL_FROM": {
+			"type": "string",
+			"metadata": {
+				"description": "Email Directus uses to communicate with users"
+			}
+		},
+		"directus_EMAIL_SMTP_HOST": {
+			"type": "string",
+			"defaultValue": "smtp.office365.com",
+			"metadata": {
+				"description": "SMTP Host"
+			}
+		},
+		"directus_EMAIL_SMTP_PASSWORD": {
+			"type": "secureString",
+			"metadata": {
+				"description": "SMTP Password for email directus uses to communicate"
+			}
+		},
+		"siteName": {
+			"type": "string",
+			"defaultValue": "devappnamecms",
+			"metadata": {
+				"description": "The name of the web app that you wish to create."
+			}
+		},
+		"dbPort": {
+			"type": "int",
+			"defaultValue": 1433,
+			"metadata": {
+				"description": "The db port you want to use, e.g. 1433"
+			}
+		},
+		"serverName": {
+			"type": "string",
+			"defaultValue": "devstereolizemssqlserver",
+			"metadata": {
+				"description": "The name of an existing MsSQL server."
+			}
+		},
+		"serverUser": {
+			"type": "string",
+			"defaultValue": "devmysqladmin",
+			"metadata": {
+				"description": "Admin user name for SQL server"
+			}
+		},
+		"serverPassword": {
+			"type": "secureString",
+			"metadata": {
+				"description": "Admin password for SQL server"
+			}
+		},
+		"databaseName": {
+			"type": "string",
+			"defaultValue": "devprojectnamemssqldb",
+			"metadata": {
+				"description": "The name of the database that you wish to create."
+			}
+		},
+		"storageAccountName": {
+			"type": "string",
+			"defaultValue": "devstereolizestorage",
+			"metadata": {
+				"description": "Name of the storage account that will host the file uploads"
+			}
+		},
+		"storageContainerName": {
+			"type": "string",
+			"defaultValue": "directusfiles",
+			"metadata": {
+				"description": "Name of the Container inside the storage account that will host the file uploads"
+			}
+		}
+	},
+	"resources": [
+		{
+			"type": "Microsoft.Sql/servers/databases",
+			"apiVersion": "2021-12-01-preview",
+			"name": "[format('{0}/{1}', parameters('serverName'), parameters('databaseName'))]",
+			"location": "[parameters('location')]",
+			"sku": {
+				"name": "GP_S_Gen5",
+				"tier": "GeneralPurpose",
+				"family": "Gen5",
+				"capacity": 1
+			},
+			"kind": "v12.0,user,vcore,serverless",
+			"properties": {
+				"collation": "SQL_Latin1_General_CP1_CI_AS",
+				"maxSizeBytes": 1073741824,
+				"catalogCollation": "SQL_Latin1_General_CP1_CI_AS",
+				"zoneRedundant": false,
+				"readScale": "Disabled",
+				"autoPauseDelay": 60,
+				"requestedBackupStorageRedundancy": "Geo",
+				"minCapacity": 0.5,
+				"isLedgerOn": false
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites",
+			"apiVersion": "2018-11-01",
+			"name": "[parameters('siteName')]",
+			"location": "[parameters('location')]",
+			"kind": "app,linux,container",
+			"properties": {
+				"enabled": true,
+				"hostNameSslStates": [
+					{
+						"name": "[concat(parameters('siteName'), '.azurewebsites.net')]",
+						"sslState": "Disabled",
+						"hostType": "Standard"
+					},
+					{
+						"name": "[concat(parameters('siteName'), '.scm.azurewebsites.net')]",
+						"sslState": "Disabled",
+						"hostType": "Repository"
+					}
+				],
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]",
+				"reserved": true,
+				"isXenon": false,
+				"hyperV": false,
+				"siteConfig": {
+					"numberOfWorkers": 1,
+					"linuxFxVersion": "[concat('DOCKER|directus/directus:', parameters('directusVersion'))]",
+					"alwaysOn": false,
+					"http20Enabled": false
+				},
+				"scmSiteAlsoStopped": false,
+				"clientAffinityEnabled": false,
+				"clientCertEnabled": false,
+				"hostNamesDisabled": false,
+				"containerSize": 0,
+				"dailyMemoryTimeQuota": 0,
+				"httpsOnly": false,
+				"redundancyMode": "None"
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/config",
+			"apiVersion": "2018-11-01",
+			"name": "[concat(parameters('siteName'), '/web')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+			],
+			"properties": {
+				"appSettings": [
+					{
+						"name": "ADMIN_EMAIL",
+						"value": "[parameters('directusAdministratorEmail')]"
+					},
+					{
+						"name": "ADMIN_PASSWORD",
+						"value": "[parameters('directusAdministratorPassword')]"
+					},
+					{
+						"name": "CACHE_ENABLED",
+						"value": false
+					},
+					{
+						"name": "DB_CLIENT",
+						"value": "mssql"
+					},
+					{
+						"name": "DB_DATABASE",
+						"value": "[parameters('databaseName')]"
+					},
+					{
+						"name": "DB_ENCRYPT",
+						"value": "true"
+					},
+					{
+						"name": "DB_HOST",
+						"value": "[concat('devstereolizedatabaseserver', '.database.windows.net')]"
+					},
+					{
+						"name": "DB_PASSWORD",
+						"value": "[parameters('serverPassword')]"
+					},
+					{
+						"name": "DB_PORT",
+						"value": "[parameters('dbPort')]"
+					},
+					{
+						"name": "DB_USER",
+						"value": "[parameters('serverUser')]"
+					},
+					{
+						"name": "EMAIL_FROM",
+						"value": "[parameters('directus_EMAIL_FROM')]"
+					},
+					{
+						"name": "EMAIL_SMTP_HOST",
+						"value": "[parameters('directus_EMAIL_SMTP_HOST')]"
+					},
+					{
+						"name": "EMAIL_SMTP_PASSWORD",
+						"value": "[parameters('directus_EMAIL_SMTP_PASSWORD')]"
+					},
+					{
+						"name": "EMAIL_SMTP_PORT",
+						"value": 587
+					},
+					{
+						"name": "EMAIL_SMTP_USER",
+						"value": "[parameters('directus_EMAIL_FROM')]"
+					},
+					{
+						"name": "EMAIL_TRANSPORT",
+						"value": "smtp"
+					},
+					{
+						"name": "KEY",
+						"value": "[guid(resourceGroup().id)]"
+					},
+					{
+						"name": "PASSWORD_RESET_URL_ALLOW_LIST",
+						"value": "[concat('https://', parameters('siteName'), '.azurewebsites.net')]"
+					},
+					{
+						"name": "PUBLIC_URL",
+						"value": "[concat('https://', parameters('siteName'), '.azurewebsites.net')]"
+					},
+					{
+						"name": "RATE_LIMITER_ENABLED",
+						"value": false
+					},
+					{
+						"name": "SECRET",
+						"value": "[concat(uniqueString(resourceGroup().id), uniqueString(guid(resourceGroup().id)))]"
+					},
+					{
+						"name": "STORAGE_LOCATIONS",
+						"value": "azure"
+					},
+					{
+						"name": "STORAGE_AZURE_DRIVER",
+						"value": "azure"
+					},
+					{
+						"name": "STORAGE_AZURE_CONTAINER_NAME",
+						"value": "[parameters('storageContainerName')]"
+					},
+					{
+						"name": "STORAGE_AZURE_ACCOUNT_NAME",
+						"value": "[parameters('storageAccountName')]"
+					},
+					{
+						"name": "STORAGE_AZURE_ACCOUNT_KEY",
+						"value": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', parameters('storageAccountName')), '2019-04-01').keys[0].value]"
+					},
+					{
+						"name": "WEBSOCKETS_ENABLED",
+						"value": true
+					}
+				],
+				"numberOfWorkers": 1,
+				"defaultDocuments": [
+					"index.html"
+				],
+				"netFrameworkVersion": "v4.0",
+				"requestTracingEnabled": false,
+				"remoteDebuggingEnabled": false,
+				"remoteDebuggingVersion": "VS2019",
+				"httpLoggingEnabled": true,
+				"logsDirectorySizeLimit": 35,
+				"detailedErrorLoggingEnabled": true,
+				"azureStorageAccounts": {},
+				"scmType": "None",
+				"use32BitWorkerProcess": true,
+				"webSocketsEnabled": false,
+				"alwaysOn": false,
+				"managedPipelineMode": "Integrated",
+				"virtualApplications": [
+					{
+						"virtualPath": "/",
+						"physicalPath": "site\\wwwroot",
+						"preloadEnabled": false
+					}
+				],
+				"loadBalancing": "LeastRequests",
+				"experiments": {
+					"rampUpRules": []
+				},
+				"autoHealEnabled": false,
+				"localMySqlEnabled": false,
+				"ipSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 1,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictions": [
+					{
+						"ipAddress": "Any",
+						"action": "Allow",
+						"priority": 1,
+						"name": "Allow all",
+						"description": "Allow all access"
+					}
+				],
+				"scmIpSecurityRestrictionsUseMain": false,
+				"http20Enabled": false,
+				"minTlsVersion": "1.2",
+				"ftpsState": "AllAllowed",
+				"reservedInstanceCount": 0
+			}
+		},
+		{
+			"type": "Microsoft.Web/sites/hostNameBindings",
+			"apiVersion": "2018-11-01",
+			"name": "[concat(parameters('siteName'), '/', parameters('siteName'), '.azurewebsites.net')]",
+			"location": "[parameters('location')]",
+			"dependsOn": [
+				"[resourceId('Microsoft.Web/sites', parameters('siteName'))]"
+			],
+			"properties": {
+				"siteName": "[parameters('siteName')]",
+				"hostNameType": "Verified"
+			}
+		},
+		{
+			"type": "Microsoft.Storage/storageAccounts/blobServices/containers",
+			"apiVersion": "2021-04-01",
+			"name": "[concat(parameters('storageAccountName'), '/default/', parameters('storageContainerName'))]",
+			"properties": {
+				"defaultEncryptionScope": "$account-encryption-key",
+				"denyEncryptionScopeOverride": false,
+				"publicAccess": "None"
+			}
+		}
+	],
+	"outputs": {
+		"uniqueId": {
+			"type": "string",
+			"value": "[uniqueString(resourceGroup().id)]"
+		}
+	}
+}
