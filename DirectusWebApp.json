@@ -135,7 +135,7 @@
 						"hostType": "Repository"
 					}
 				],
-				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('serverFarmName'))]",
+				"serverFarmId": "[resourceId('Microsoft.Web/serverfarms', parameters('appServicePlan'))]",
 				"reserved": true,
 				"isXenon": false,
 				"hyperV": false,
