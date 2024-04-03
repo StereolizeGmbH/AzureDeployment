@@ -34,6 +34,7 @@
 		},
 		"directus_EMAIL_FROM": {
 			"type": "string",
+			"defaultValue": "support@stereolize.com",
 			"metadata": {
 				"description": "Email Directus uses to communicate with users"
 			}
@@ -43,6 +44,13 @@
 			"defaultValue": "smtp.office365.com",
 			"metadata": {
 				"description": "SMTP Host"
+			}
+		},
+		"directus_EMAIL_SMTP_USER": {
+			"type": "string",
+			"defaultValue": "sven.krippner@stereolize.com",
+			"metadata": {
+				"description": "User name for SMTP auth, usually the email address"
 			}
 		},
 		"directus_EMAIL_SMTP_PASSWORD": {
@@ -225,7 +233,7 @@
 					},
 					{
 						"name": "EMAIL_SMTP_USER",
-						"value": "[parameters('directus_EMAIL_FROM')]"
+						"value": "[parameters('directus_EMAIL_SMTP_USER')]"
 					},
 					{
 						"name": "EMAIL_TRANSPORT",
