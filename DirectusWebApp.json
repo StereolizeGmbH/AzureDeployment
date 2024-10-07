@@ -178,6 +178,22 @@
 						"value": false
 					},
 					{
+						"name": "CORS_ALLOWED_HEADERS",
+						"value": "Content-Type,Authorization"
+					},
+					{
+						"name": "CORS_ENABLED",
+						"value": true
+					},
+					{
+						"name": "CORS_METHODS",
+						"value": "GET,POST,PATCH,DELETE"
+					},
+					{
+						"name": "CORS_ORIGIN",
+						"value": true
+					},
+					{
 						"name": "DB_CLIENT",
 						"value": "[parameters('dbClient')]"
 					},
