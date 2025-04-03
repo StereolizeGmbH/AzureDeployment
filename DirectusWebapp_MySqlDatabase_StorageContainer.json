@@ -34,21 +34,21 @@
 		},
 		"directus_EMAIL_FROM": {
 			"type": "string",
-			"defaultValue": "support@stereolize.com",
+			"defaultValue": "support@stereolize.de",
 			"metadata": {
 				"description": "Email Directus uses to communicate with users"
 			}
 		},
 		"directus_EMAIL_SMTP_HOST": {
 			"type": "string",
-			"defaultValue": "smtp.office365.com",
+			"defaultValue": "smtp.ionos.de",
 			"metadata": {
 				"description": "SMTP Host"
 			}
 		},
 		"directus_EMAIL_SMTP_USER": {
 			"type": "string",
-			"defaultValue": "sven.krippner@stereolize.com",
+			"defaultValue": "support@stereolize.de",
 			"metadata": {
 				"description": "User name for SMTP auth, usually the email address"
 			}
