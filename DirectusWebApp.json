@@ -41,13 +41,14 @@
 		},
 		"directus_EMAIL_FROM": {
 			"type": "string",
+			"defaultValue": "support@stereolize.de",
 			"metadata": {
 				"description": "Email Directus uses to communicate with users"
 			}
 		},
 		"directus_EMAIL_SMTP_HOST": {
 			"type": "string",
-			"defaultValue": "smtp.office365.com",
+			"defaultValue": "smtp.ionos.de",
 			"metadata": {
 				"description": "SMTP Host"
 			}
