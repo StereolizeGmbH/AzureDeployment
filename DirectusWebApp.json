@@ -22,7 +22,7 @@
 		},
 		"directusVersion": {
 			"type": "string",
-			"defaultValue": "latest",
+			"defaultValue": "9.26.0",
 			"metadata": {
 				"description": "Directus Version, like 9.26.0 or latest"
 			}
