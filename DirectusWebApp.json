@@ -22,7 +22,7 @@
 		},
 		"directusVersion": {
 			"type": "string",
-			"defaultValue": "9.26.0",
+			"defaultValue": "latest",
 			"metadata": {
 				"description": "Directus Version, like 9.26.0 or latest"
 			}
@@ -39,6 +39,14 @@
 				"description": "Directus administrative account password"
 			}
 		},
+		
+		/* ---------------- Email: shared + transport choice ---------------- */
+		"emailTransport": {
+		  "type": "string",
+		  "defaultValue": "smtp",
+		  "allowedValues": [ "smtp", "mailgun" ],
+		  "metadata": { "description": "Choose how Directus sends email: smtp or mailgun" }
+		},			
 		"directus_EMAIL_FROM": {
 			"type": "string",
 			"defaultValue": "support@stereolize.de",
@@ -46,6 +54,8 @@
 				"description": "Email Directus uses to communicate with users"
 			}
 		},
+		
+		/* ---------------- SMTP settings ---------------- */
 		"directus_EMAIL_SMTP_HOST": {
 			"type": "string",
 			"defaultValue": "smtp.ionos.de",
@@ -59,6 +69,25 @@
 				"description": "SMTP Password for email directus uses to communicate"
 			}
 		},
+		
+		/* ---------------- Mailgun settings ---------------- */
+		"directus_EMAIL_MAILGUN_API_KEY": {
+		  "type": "secureString",
+		  "defaultValue": "",
+		  "metadata": { "description": "Mailgun API key (Domain Sending Key or Account API Key)" }
+		},
+		"directus_EMAIL_MAILGUN_DOMAIN": {
+		  "type": "string",
+		  "defaultValue": "",
+		  "metadata": { "description": "Mailgun sending domain (e.g. mg.example.com)" }
+		},
+		"directus_EMAIL_MAILGUN_HOST": {
+		  "type": "string",
+		  "defaultValue": "api.mailgun.net",
+		  "metadata": { "description": "Mailgun API host (use api.eu.mailgun.net for EU region if needed)" }
+		},
+		
+		/* ---------------- Database & Storage ---------------- */
 		"dbClient": {
 			"type": "string",
 			"defaultValue": "mysql",
@@ -222,10 +251,17 @@
 						"name": "DB_USER",
 						"value": "[parameters('serverUser')]"
 					},
+					
+					/* ------------- Email (shared + transport) ------------- */
 					{
 						"name": "EMAIL_FROM",
 						"value": "[parameters('directus_EMAIL_FROM')]"
 					},
+					{ 	"name": "EMAIL_TRANSPORT", 
+						"value": "[parameters('emailTransport')]"
+					},
+					
+					/* SMTP (used when EMAIL_TRANSPORT = smtp) */
 					{
 						"name": "EMAIL_SMTP_HOST",
 						"value": "[parameters('directus_EMAIL_SMTP_HOST')]"
@@ -239,13 +275,26 @@
 						"value": 587
 					},
 					{
+						"name": "EMAIL_SMTP_SECURE",
+						"value": false
+					},
+					{
 						"name": "EMAIL_SMTP_USER",
 						"value": "[parameters('directus_EMAIL_FROM')]"
 					},
-					{
-						"name": "EMAIL_TRANSPORT",
-						"value": "smtp"
+					
+					/* Mailgun (used when EMAIL_TRANSPORT = mailgun) */
+					{	"name": "EMAIL_MAILGUN_API_KEY",
+						"value": "[parameters('directus_EMAIL_MAILGUN_API_KEY')]"
 					},
+					{	"name": "EMAIL_MAILGUN_DOMAIN",
+						"value": "[parameters('directus_EMAIL_MAILGUN_DOMAIN')]"
+					},
+					{	"name": "EMAIL_MAILGUN_HOST", 
+						"value": "[parameters('directus_EMAIL_MAILGUN_HOST')]"
+					},			
+
+					/* Database & Storage */					
 					{
 						"name": "KEY",
 						"value": "[guid(resourceGroup().id)]"
