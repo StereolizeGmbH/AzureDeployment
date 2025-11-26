@@ -198,6 +198,10 @@
 			"properties": {
 				"appSettings": [
 					{
+						"name": "DIRECTUS_VERSION",
+						"value": "[parameters('directusVersion')]"
+					},
+					{
 						"name": "ADMIN_EMAIL",
 						"value": "[parameters('directusAdministratorEmail')]"
 					},
